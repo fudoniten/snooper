@@ -1,0 +1,16 @@
+{
+ :paths ["src"]
+ :deps {
+        org.clojure/clojure { :mvn/version "1.11.1" }
+        org.clojure/tools.cli {:mvn/version "1.0.214"}
+        metosin/malli { :mvn/version "0.11.0" }
+        org.fudo/fudo-clojure {
+                               :git/url "https://git.fudo.org/fudo-public/fudo-clojure.git"
+                               :git/sha "2352892ad7d7cf7c6bd294005a28d55ef224862a"
+                               }
+        org.fudo/milquetoast {
+                              :git/url "https://git.fudo.org/fudo-public/milquetoast.git"
+                              :git/sha "ae81b91f0c710632f55b43f0193e16ab0dd81dde"
+                              }
+        }
+}
