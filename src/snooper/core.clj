@@ -1,18 +1,21 @@
 (ns snooper.core
-  (:require [clojure.core.async :refer [go-loop alts! chan]]
+  (:require [clojure.core.async :refer [go-loop alts!]]
+            [clojure.pprint :refer [pprint]]
             [fudo-clojure.logging :as log]
             [milquetoast.client :as mqtt]
             [malli.core :as t]))
 
-(defn pthru [o] (clojure.pprint/pprint o) o)
-
 (def critical-objects [:person :bear])
 (def normal-objects [:cat :dog])
+
+(defn- verbose-pthru [verbose obj]
+  (when verbose (pprint obj))
+  obj)
 
 (defn- objects-criticality [objs]
   (cond (some (partial contains? objs) critical-objects) :high
         (some (partial contains? objs) normal-objects)   :medium
-        :else                                            nil))
+        :else                                            :low))
 
 (defn- objects-probability [objs]
   (let [prob (apply max (vals objs))]
@@ -58,7 +61,7 @@
 (defmethod event-summary :possibly [{:keys [description location]}]
   (format "There could possibly be %s at the %s" description location))
 (defmethod event-summary :likely [{:keys [description location]}]
-  (format "There's might %s at the %s" description location))
+  (format "There might be %s at the %s" description location))
 (defmethod event-summary :probably [{:keys [description location]}]
   (format "There's probably %s at the %s" description location))
 (defmethod event-summary :definitely [{:keys [description location]}]
@@ -84,17 +87,19 @@
   [& {mqtt-client        :mqtt-client
       notification-topic :notification-topic
       event-topics       :event-topics
-      logger             :logger}]
+      logger             :logger
+      verbose            :verbose}]
   (let [incoming (map (partial mqtt/subscribe! mqtt-client) event-topics)
         valid-evt? (t/validator MotionEvent)]
     (go-loop [evts (alts! incoming)]
       (let [evt (first evts)]
-        (clojure.pprint/pprint evt)
+        (when verbose (pprint evt))
         (cond (nil? evt)       (log/info! logger "stopping")
               (valid-evt? evt) (do (log/info! logger (format "received motion event id %s from %s"
                                                              (:id evt)
                                                              (:topic evt)))
-                                   (mqtt/send! mqtt-client notification-topic (pthru (translate-event (:payload evt))))
+                                   (mqtt/send! mqtt-client notification-topic
+                                               (verbose-pthru verbose (translate-event (:payload evt))))
                                    (recur (alts! incoming)))
               :else            (do (log/error! logger (format "invalid motion event: %s" evt))
                                    (recur (alts! incoming))))))))

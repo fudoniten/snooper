@@ -17,7 +17,7 @@
         packages = rec {
           default = snooper-server;
           snooper-server = helpers.packages."${system}".mkClojureBin {
-            name = "org.fudo/snooper";
+            name = "org.fudo/snooper-server";
             primaryNamespace = "snooper.cli";
             src = ./.;
           };
