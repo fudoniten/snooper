@@ -4,7 +4,7 @@ packages:
 
 with lib;
 let
-  snooper-server = packages."${pkgs.system}.snooper-server";
+  snooper-server = packages."${pkgs.system}".snooper-server;
   cfg = config.services.snooper;
 
 in {
