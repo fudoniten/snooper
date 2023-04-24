@@ -23,7 +23,7 @@ in {
       description = "MQTT topic on which to send notifications.";
     };
 
-    mqtt-client = {
+    mqtt = {
       host = mkOption {
         type = str;
         description = "Hostname of the MQTT server.";
