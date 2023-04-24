@@ -54,7 +54,7 @@ in {
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         DynamicUser = true;
-        LoadCredential = [ "mqtt.passwd:${cfg.mqtt-client.password-file}" ];
+        LoadCredential = [ "mqtt.passwd:${cfg.mqtt.password-file}" ];
         ExecStart = pkgs.writeShellScript "snooper-server.sh"
           (concatStringsSep " " ([
             "snooper-server"
