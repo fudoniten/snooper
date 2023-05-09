@@ -48,33 +48,45 @@
         {:keys [options _ errors summary]} (parse-opts args required-args cli-opts)]
     (when (:help options) (msg-quit 0 (usage summary)))
     (when (seq errors) (msg-quit 1 (usage summary errors)))
-    (let [{:keys [mqtt-host
-                  mqtt-port
-                  mqtt-user
-                  mqtt-password-file
+    (let [{:keys [incoming-mqtt-host
+                  incoming-mqtt-port
+                  incoming-mqtt-user
+                  incoming-mqtt-password-file
+                  outgoing-mqtt-host
+                  outgoing-mqtt-port
+                  outgoing-mqtt-user
+                  outgoing-mqtt-password-file
                   notification-topic
                   event-topic
                   verbose]} options
           catch-shutdown (async/chan)
-          mqtt-client (mqtt/connect-json! :host mqtt-host
-                                          :port mqtt-port
-                                          :username mqtt-user
-                                          :password (-> mqtt-password-file
-                                                        (slurp)
-                                                        (str/trim)))
+          incoming-client (mqtt/connect-json! :host incoming-mqtt-host
+                                              :port incoming-mqtt-port
+                                              :username incoming-mqtt-user
+                                              :password (-> incoming-mqtt-password-file
+                                                            (slurp)
+                                                            (str/trim)))
+          outgoing-client (mqtt/connect-json! :host outgoing-mqtt-host
+                                              :port outgoing-mqtt-port
+                                              :username outgoing-mqtt-user
+                                              :password (-> outgoing-mqtt-password-file
+                                                            (slurp)
+                                                            (str/trim)))
           logger (log/print-logger)]
       (when verbose
         (println (format "launching snooper server to listen on %s and report events on %s"
                          event-topic notification-topic)))
-      (snooper/listen! :mqtt-client        mqtt-client
-                       :notification-topic notification-topic
-                       :event-topics       event-topic
-                       :logger             logger
-                       :verbose            verbose)
+      (snooper/listen! :incoming-mqtt-client incoming-client
+                       :outgoing-mqtt-client outgoing-client
+                       :notification-topic   notification-topic
+                       :event-topics         event-topic
+                       :logger               logger
+                       :verbose              verbose)
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn [] (>!! catch-shutdown true))))
       (<!! catch-shutdown)
       (println "stopping snooper server")
       ;; Stopping the MQTT will stop tattler
-      (mqtt/stop! mqtt-client)
+      (mqtt/stop! incoming-client)
+      (mqtt/stop! outgoing-client)
       (System/exit 0))))

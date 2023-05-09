@@ -84,12 +84,13 @@
      :urgency criticality}))
 
 (defn listen!
-  [& {mqtt-client        :mqtt-client
+  [& {incoming-client    :incoming-mqtt-client
+      outgoing-client    :outgoing-mqtt-client
       notification-topic :notification-topic
       event-topics       :event-topics
       logger             :logger
       verbose            :verbose}]
-  (let [incoming (map (partial mqtt/subscribe! mqtt-client) event-topics)
+  (let [incoming (map (partial mqtt/subscribe! incoming-client) event-topics)
         valid-evt? (t/validator MotionEvent)]
     (go-loop [evts (alts! incoming)]
       (let [evt (first evts)]
@@ -98,7 +99,7 @@
               (valid-evt? evt) (do (log/info! logger (format "received motion event id %s from %s"
                                                              (:id evt)
                                                              (:topic evt)))
-                                   (mqtt/send! mqtt-client notification-topic
+                                   (mqtt/send! outgoing-client notification-topic
                                                (verbose-pthru verbose (translate-event (:payload evt))))
                                    (recur (alts! incoming)))
               :else            (do (log/error! logger (format "invalid motion event: %s" evt))
