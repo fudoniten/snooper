@@ -12,11 +12,17 @@
   [["-v" "--verbose" "Provide verbose output."]
    ["-h" "--help" "Print this message."]
 
-   [nil "--mqtt-host HOSTNAME" "Hostname of MQTT server."]
-   [nil "--mqtt-port PORT" "Port on which to connect to the MQTT server."
+   [nil "--incoming-mqtt-host HOSTNAME" "Hostname of MQTT server on which to listen for events."]
+   [nil "--incoming-mqtt-port PORT" "Port on which to connect to the incoming MQTT server."
     :parse-fn #(Integer/parseInt %)]
-   [nil "--mqtt-user USER" "User as which to connect to MQTT server."]
-   [nil "--mqtt-password-file PASSWD_FILE" "File containing password for MQTT user."]
+   [nil "--incoming-mqtt-user USER" "User as which to connect to MQTT server."]
+   [nil "--incoming-mqtt-password-file PASSWD_FILE" "File containing password for MQTT user."]
+
+   [nil "--outgoing-mqtt-host HOSTNAME" "Hostname of MQTT server to which notifications will be sent."]
+   [nil "--outgoing-mqtt-port PORT" "Port on which to connect to the outgoing MQTT server."
+    :parse-fn #(Integer/parseInt %)]
+   [nil "--outgoing-mqtt-user USER" "User as which to connect to MQTT server."]
+   [nil "--outgoing-mqtt-password-file PASSWD_FILE" "File containing password for MQTT user."]
 
    [nil "--event-topic EVT_TOPIC" "MQTT topic to which events should be published."
     :multi true
