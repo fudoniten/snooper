@@ -50,7 +50,16 @@
     (update result :errors concat missing-errors)))
 
 (defn -main [& args]
-  (let [required-args #{:mqtt-host :mqtt-port :mqtt-user :mqtt-password-file :event-topic :notification-topic}
+  (let [required-args #{:incoming-mqtt-host
+                        :incoming-mqtt-port
+                        :incoming-mqtt-user
+                        :incoming-mqtt-password-file
+                        :outgoing-mqtt-host
+                        :outgoing-mqtt-port
+                        :outgoing-mqtt-user
+                        :outgoing-mqtt-password-file
+                        :event-topic
+                        :notification-topic}
         {:keys [options _ errors summary]} (parse-opts args required-args cli-opts)]
     (when (:help options) (msg-quit 0 (usage summary)))
     (when (seq errors) (msg-quit 1 (usage summary errors)))
