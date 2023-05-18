@@ -13,9 +13,9 @@
   obj)
 
 (defn- objects-criticality [objs]
-  (cond (some (partial contains? objs) critical-objects) :high
-        (some (partial contains? objs) normal-objects)   :medium
-        :else                                            :low))
+  (cond (some (partial contains? objs) critical-objects) 9
+        (some (partial contains? objs) normal-objects)   5
+        :else                                            1))
 
 (defn- objects-probability [objs]
   (let [prob (apply max (vals objs))]
@@ -32,7 +32,7 @@
   (t/schema [:map
              [:summary (sized-string 1 80)]
              [:body    (sized-string 1 256)]
-             [:urgency {:optional true} [:enum :low :medium :high]]]))
+             [:urgency [:and :int [:>= 0] [:<= 10]]]]))
 
 (def MotionEvent
   (t/schema [:map
