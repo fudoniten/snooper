@@ -101,6 +101,8 @@ in {
           ] ++ (map (topic: "--event-topic=${topic}") cfg.event-topics)
             ++ (optional cfg.verbose "--verbose")));
       };
+      unitConfig.ConditionPathExists =
+        [ cfg.mqtt.incoming.password-file cfg.mqtt.outgoing.password-file ];
     };
   };
 }
