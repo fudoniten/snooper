@@ -77,8 +77,11 @@ in {
     systemd.services.snooper = {
       path = [ snooper-server ];
       wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target" ];
       serviceConfig = {
         DynamicUser = true;
+        Restart = "on-failure";
+        RestartSec = "120s";
         LoadCredential = [
           "mqtt-incoming.passwd:${cfg.mqtt.incoming.password-file}"
           "mqtt-outgoing.passwd:${cfg.mqtt.outgoing.password-file}"
