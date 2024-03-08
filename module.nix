@@ -74,7 +74,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    systemd.services.snooper = {
+    systemd.services.snooper-server = {
       path = [ snooper-server ];
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
