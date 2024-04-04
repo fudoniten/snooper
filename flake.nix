@@ -2,7 +2,7 @@
   description = "Snooper Event Notifier";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-22.05";
+    nixpkgs.url = "nixpkgs/nixos-23.11";
     utils.url = "github:numtide/flake-utils";
     helpers = {
       url = "git+https://fudo.dev/public/nix-helpers.git";
@@ -27,7 +27,7 @@
           default = updateDeps;
           updateDeps = pkgs.mkShell {
             buildInputs = with helpers.packages."${system}";
-              [ updateClojureDeps ];
+              [ (updateClojureDeps { }) ];
           };
           snooperServer = pkgs.mkShell {
             buildInputs = with self.packages."${system}"; [ snooper-server ];
