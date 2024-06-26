@@ -92,7 +92,7 @@
       verbose            :verbose}]
   (let [incoming (map (partial mqtt/subscribe! incoming-client) event-topics)
         valid-evt? (t/validator MotionEvent)]
-    (go-loop [evts (alts! incoming)]
+    (go-loop [[evts _] (alts! incoming)]
       (let [evt (first evts)]
         (when verbose (pprint evt))
         (cond (nil? evt)       (log/info! logger "stopping")
